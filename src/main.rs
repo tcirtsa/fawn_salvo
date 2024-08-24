@@ -53,7 +53,11 @@ async fn main() {
         .allow_methods(vec![Method::GET, Method::POST, Method::PUT, Method::DELETE])
         .into_handler();
 
-    let router = Router::with_path("/test").hoop(cors).get(handler::test::test);
+    let router = Router::new()
+        .hoop(cors)
+        .push(Router::with_path("/hello").get(hello))
+        .push(Router::with_path("/test").get(handler::test::test))
+        .push(Router::with_path("/test2").get(handler::test::test2));
     let acceptor = TcpListener::new("127.0.0.1:7878").bind().await;
     Server::new(acceptor).serve(router).await;
 }
