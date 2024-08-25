@@ -55,9 +55,10 @@ async fn main() {
 
     let router = Router::new()
         .hoop(cors)
-        .push(Router::with_path("/hello").get(hello))
+        .push(Router::with_path("/").get(hello))
         .push(Router::with_path("/test").get(handler::test::test))
-        .push(Router::with_path("/test2").get(handler::test::test2));
+        .push(Router::with_path("/test2").get(handler::test::test2))
+        .push(Router::with_path("/ws").goal(handler::ws::user_connected));
     let acceptor = TcpListener::new("127.0.0.1:7878").bind().await;
     Server::new(acceptor).serve(router).await;
 }
