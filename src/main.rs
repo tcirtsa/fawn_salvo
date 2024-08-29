@@ -60,5 +60,13 @@ async fn main() {
         .push(Router::with_path("/test2").get(handler::test::test2))
         .push(Router::with_path("/ws").goal(handler::ws::user_connected));
     let acceptor = TcpListener::new("127.0.0.1:7878").bind().await;
-    Server::new(acceptor).serve(router).await;
+    let server = Server::new(acceptor);
+    let handle = server.handle();
+
+    // 优雅地关闭服务器
+    tokio::spawn(async move {
+        tokio::time::sleep(std::time::Duration::from_secs(60)).await;
+        handle.stop_graceful(None);
+    });
+    server.serve(router).await;
 }
