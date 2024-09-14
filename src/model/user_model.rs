@@ -12,6 +12,7 @@ pub struct User {
     pub phone: Option<String>,
     //头像url
     pub avatar_url: Option<String>,
+    //简介
     pub bio: Option<String>,
     //创建时间
     pub created_at: Option<chrono::NaiveDateTime>,

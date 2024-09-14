@@ -1,15 +1,15 @@
-mod handler;
 mod db;
+mod handler;
 mod model;
 
-use salvo::http::Method;
-use salvo::prelude::*;
-use salvo::cors::Cors;
 use diesel::mysql::MysqlConnection;
 use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
-use std::{env, vec};
 use dotenv::dotenv;
 use once_cell::sync::OnceCell;
+use salvo::cors::Cors;
+use salvo::http::Method;
+use salvo::prelude::*;
+use std::{env, vec};
 
 pub type DbPool = Pool<ConnectionManager<MysqlConnection>>;
 
@@ -42,11 +42,13 @@ async fn main() {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     DB_POOL
-        .set(build_pool(&database_url, 10).expect(&format!("Error connecting to {}", &database_url)))
+        .set(
+            build_pool(&database_url, 10).expect(&format!("Error connecting to {}", &database_url)),
+        )
         .ok();
-    
+
     tracing_subscriber::fmt::init();
-    
+
     let cors = Cors::new()
         .allow_origin("*")
         .allow_credentials(false)
@@ -58,7 +60,8 @@ async fn main() {
         .push(Router::with_path("/").get(hello))
         .push(Router::with_path("/test").get(handler::test::test))
         .push(Router::with_path("/test2").get(handler::test::test2))
-        .push(Router::with_path("/ws").goal(handler::ws::user_connected));
+        .push(Router::with_path("/ws").goal(handler::ws::user_connected))
+        .push(Router::with_path("/register").post(handler::user::register));
     let acceptor = TcpListener::new("127.0.0.1:7878").bind().await;
     let server = Server::new(acceptor);
     let handle = server.handle();
