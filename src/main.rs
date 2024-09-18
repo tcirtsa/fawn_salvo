@@ -68,7 +68,7 @@ async fn main() {
 
     // 优雅地关闭服务器
     tokio::spawn(async move {
-        tokio::time::sleep(std::time::Duration::from_secs(60)).await;
+        tokio::time::sleep(std::time::Duration::from_secs(300)).await;
         handle.stop_graceful(None);
     });
     server.serve(router).await;
