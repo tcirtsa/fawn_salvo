@@ -52,16 +52,16 @@ async fn main() {
     let cors = Cors::new()
         .allow_origin("*")
         .allow_credentials(false)
-        .allow_methods(vec![Method::GET, Method::POST, Method::PUT, Method::DELETE])
+        .allow_headers(vec!["authorization", "content-type"])
         .into_handler();
 
     let router = Router::new()
-        .hoop(cors)
-        .push(Router::with_path("/").get(hello))
+        .push(Router::with_path("/test2").post(handler::test::test2))
+        .push(Router::with_path("/").post(hello))
         .push(Router::with_path("/test").get(handler::test::test))
-        .push(Router::with_path("/test2").get(handler::test::test2))
         .push(Router::with_path("/ws").goal(handler::ws::user_connected))
         .push(Router::with_path("/register").post(handler::user::register));
+    let service = Service::new(router).hoop(cors);
     let acceptor = TcpListener::new("127.0.0.1:7878").bind().await;
     let server = Server::new(acceptor);
     let handle = server.handle();
@@ -71,5 +71,5 @@ async fn main() {
         tokio::time::sleep(std::time::Duration::from_secs(300)).await;
         handle.stop_graceful(None);
     });
-    server.serve(router).await;
+    server.serve(service).await;
 }

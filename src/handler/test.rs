@@ -22,12 +22,9 @@ pub async fn test(res: &mut Response) ->Result<(),Error> {
 }
 
 #[handler]
-pub async fn test2(res: &mut Response) ->Result<(),Error> {
+pub async fn test2(res: &mut Response,req: &mut Request) ->Result<(),Error> {
     let mut conn = connect().unwrap();
-    let new_a = A {
-        account: "tcirtsa".to_string(),
-        psd: "123456".to_string(),
-    };
+    let new_a = req.parse_json::<A>().await?;
     let result = diesel::insert_into(a).values(&new_a).execute(&mut conn);
     match result {
         Ok(data) => {
