@@ -41,6 +41,8 @@ async fn main() {
     // 从环境变量获取数据库的连接字符串
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
+    let local_ip = env::var("LOCAL_IP").expect("LOCAL_IP must be set");
+
     DB_POOL
         .set(
             build_pool(&database_url, 10).expect(&format!("Error connecting to {}", &database_url)),
@@ -58,12 +60,12 @@ async fn main() {
 
     let router = Router::new()
         .push(Router::with_path("/test2").post(handler::test::test2))
-        .push(Router::with_path("/").post(hello))
+        .push(Router::with_path("/").get(hello))
         .push(Router::with_path("/test").get(handler::test::test))
         .push(Router::with_path("/ws").goal(handler::ws::user_connected))
         .push(Router::with_path("/register").post(handler::user::register));
     let service = Service::new(router).hoop(cors);
-    let acceptor = TcpListener::new("127.0.0.1:7878").bind().await;
+    let acceptor = TcpListener::new(format!("{}:7878", local_ip)).bind().await;
     let server = Server::new(acceptor);
     let handle = server.handle();
 
