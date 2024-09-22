@@ -9,7 +9,7 @@ use salvo::{prelude::*, Error};
 pub async fn register(req: &mut Request, res: &mut Response) -> Result<(), Error> {
     let mut conn = connect().unwrap();
     let mut new_user = req.parse_json::<NewUser>().await?;
-    new_user.created_at = Some(chrono::Utc::now().naive_utc());
+    new_user.created_at = Some(chrono::Utc::now().naive_utc()+chrono::Duration::hours(8));
     let result = diesel::insert_into(users).values(&new_user).execute(&mut conn);
     match result {
         Ok(_) => {
