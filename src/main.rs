@@ -57,11 +57,14 @@ async fn main() {
         .into_handler();
 
     let router = Router::new()
-        .push(Router::with_path("/test2").post(handler::test::test2))
-        .push(Router::with_path("/").get(hello))
-        .push(Router::with_path("/test").get(handler::test::test))
+        .push(Router::with_path("/hello").push(Router::with_path("/123").get(hello)))
         .push(Router::with_path("/ws").goal(handler::ws::user_connected))
-        .push(Router::with_path("/register").post(handler::user::register));
+        .push(Router::with_path("/register").post(handler::user::register))
+        .push(
+            Router::with_path("/user")
+                .push(Router::with_path("/updata_head").post(handler::user::updata_head))
+                .push(Router::with_path("/get_user").post(handler::user::get_user)),
+        );
     let service = Service::new(router).hoop(cors);
     let acceptor = TcpListener::new("0.0.0.0:7878").bind().await;
     let server = Server::new(acceptor);

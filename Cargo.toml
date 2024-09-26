@@ -10,7 +10,7 @@ tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
 dotenv = "0.15.0"
 serde = { version = "1.0.209", features = ["derive"] }
-diesel = { version = "2.2.3", features = [
+diesel = { version = "2.2.4", features = [
     "mysql",
     "r2d2",
     "chrono",
