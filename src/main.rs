@@ -82,7 +82,7 @@ async fn main() {
                             Router::with_path("/comment")
                                 .push(Router::with_path("/<comment_id>").post(handler::comment::get_comment))
                                 .push(
-                                    Router::with_path("/<user_id>")
+                                    Router::with_path("/add_comment")
                                         .post(handler::comment::add_comment),
                                 ),
                         ),
