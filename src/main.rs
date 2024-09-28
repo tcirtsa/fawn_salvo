@@ -79,10 +79,10 @@ async fn main() {
                                 .delete(handler::like::delete_like),
                         )
                         .push(
-                            Router::with_path("/comment/<user_id>")
-                                .post(handler::comment::get_comment)
+                            Router::with_path("/comment")
+                                .push(Router::with_path("/<comment_id>").post(handler::comment::get_comment))
                                 .push(
-                                    Router::with_path("/add_comment")
+                                    Router::with_path("/<user_id>")
                                         .post(handler::comment::add_comment),
                                 ),
                         ),

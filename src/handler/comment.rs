@@ -9,10 +9,10 @@ use salvo::{prelude::*, Error};
 pub async fn get_comment(req: &mut Request, res: &mut Response) -> Result<(), Error> {
     let mut conn = connect().unwrap();
     let p_id = req.param::<i32>("post_id").unwrap();
-    let u_id = req.param::<i32>("user_id").unwrap();
+    let u_id = req.param::<i32>("comment_id").unwrap();
     let result = comments
         .filter(post_id.eq(p_id))
-        .filter(user_id.eq(u_id))
+        .filter(comment_id.eq(u_id))
         .load::<Comment>(&mut conn);
     match result {
         Ok(data) => {
