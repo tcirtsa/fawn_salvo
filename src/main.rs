@@ -63,7 +63,30 @@ async fn main() {
         .push(
             Router::with_path("/user")
                 .push(Router::with_path("/updata_head").post(handler::user::updata_head))
-                .push(Router::with_path("/get_user").post(handler::user::get_user)),
+                .push(Router::with_path("/get_user").post(handler::user::get_user))
+                .push(Router::with_path("/get_user_posts").post(handler::post::get_user_posts)),
+        )
+        .push(
+            Router::with_path("/posts")
+                .push(Router::with_path("/add_post").post(handler::post::add_post))
+                .push(
+                    Router::with_path("/<post_id>")
+                        .post(handler::post::get_post)
+                        .push(Router::with_path("/like_count").post(handler::like::get_like_count))
+                        .push(
+                            Router::with_path("/like/<user_id>")
+                                .post(handler::like::add_like)
+                                .delete(handler::like::delete_like),
+                        )
+                        .push(
+                            Router::with_path("/comment/<user_id>")
+                                .post(handler::comment::get_comment)
+                                .push(
+                                    Router::with_path("/add_comment")
+                                        .post(handler::comment::add_comment),
+                                ),
+                        ),
+                ),
         );
     let service = Service::new(router).hoop(cors);
     let acceptor = TcpListener::new("0.0.0.0:7878").bind().await;
