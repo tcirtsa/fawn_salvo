@@ -76,7 +76,7 @@ async fn main() {
         .into_handler();
 
     let router = Router::new()
-        .push(Router::with_path("/login").goal(handler::user::login).hoop(auth_handler))
+        .push(Router::with_path("/login").goal(handler::user::auth).hoop(auth_handler))
         .push(Router::with_path("/hello").push(Router::with_path("/123").get(hello)))
         .push(Router::with_path("/ws").goal(handler::ws::user_connected))
         .push(Router::with_path("/register").post(handler::user::register))

@@ -80,7 +80,7 @@ pub async fn get_user(req: &mut Request, res: &mut Response) -> Result<(), Error
 }
 
 #[handler]
-pub async fn login(req: &mut Request, depot: &mut Depot, res: &mut Response) -> Result<(), Error> {
+pub async fn auth(req: &mut Request, depot: &mut Depot, res: &mut Response) -> Result<(), Error> {
     if req.method() == Method::POST {
         let mut conn = connect().unwrap();
         let info = req.parse_json::<Info>().await?;
