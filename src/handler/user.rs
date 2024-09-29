@@ -103,7 +103,8 @@ pub async fn login(req: &mut Request, depot: &mut Depot, res: &mut Response) -> 
                     &EncodingKey::from_secret(secret.as_bytes()),
                 )
                 .unwrap();
-                res.render(Redirect::other(&format!("/?jwt_token={}", token)));
+                res.render(Text::Plain(token));
+                return Ok(());
             }
             Err(e) => {
                 res.render(Json(&e.to_string()));
