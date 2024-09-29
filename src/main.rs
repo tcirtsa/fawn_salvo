@@ -8,8 +8,16 @@ use dotenv::dotenv;
 use once_cell::sync::OnceCell;
 use salvo::cors::Cors;
 use salvo::http::Method;
+use salvo::jwt_auth::{ConstDecoder, QueryFinder};
 use salvo::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::{env, vec};
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct JwtClaims {
+    username: String,
+    exp: i64,
+}
 
 pub type DbPool = Pool<ConnectionManager<MysqlConnection>>;
 
@@ -41,6 +49,8 @@ async fn main() {
     // 从环境变量获取数据库的连接字符串
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
+    let jwt_secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+
     DB_POOL
         .set(
             build_pool(&database_url, 10).expect(&format!("Error connecting to {}", &database_url)),
@@ -48,6 +58,15 @@ async fn main() {
         .ok();
 
     tracing_subscriber::fmt::init();
+
+    let auth_handler: JwtAuth<JwtClaims, _> =
+        JwtAuth::new(ConstDecoder::from_secret(jwt_secret.as_bytes()))
+            .finders(vec![
+                // Box::new(HeaderFinder::new()),
+                Box::new(QueryFinder::new("jwt_token")),
+                // Box::new(CookieFinder::new("jwt_token")),
+            ])
+            .force_passed(true);
 
     let cors = Cors::new()
         .allow_origin("*")
@@ -57,6 +76,7 @@ async fn main() {
         .into_handler();
 
     let router = Router::new()
+        .push(Router::with_path("/login").goal(handler::user::login).hoop(auth_handler))
         .push(Router::with_path("/hello").push(Router::with_path("/123").get(hello)))
         .push(Router::with_path("/ws").goal(handler::ws::user_connected))
         .push(Router::with_path("/register").post(handler::user::register))
@@ -80,7 +100,10 @@ async fn main() {
                         )
                         .push(
                             Router::with_path("/comment")
-                                .push(Router::with_path("/<comment_id>").post(handler::comment::get_comment))
+                                .push(
+                                    Router::with_path("/<comment_id>")
+                                        .post(handler::comment::get_comment),
+                                )
                                 .push(
                                     Router::with_path("/add_comment")
                                         .post(handler::comment::add_comment),
