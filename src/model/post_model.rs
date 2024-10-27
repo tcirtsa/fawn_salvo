@@ -13,6 +13,8 @@ pub struct Post {
     pub audio_url: Option<String>,
     pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_at: Option<chrono::NaiveDateTime>,
+    pub like_count: Option<i32>,
+    pub comment_count: Option<i32>,
 }
 
 #[derive(Insertable, Serialize, Deserialize,Debug)]

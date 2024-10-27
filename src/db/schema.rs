@@ -19,12 +19,46 @@ pub mod sql_types {
 }
 
 diesel::table! {
+    a (account) {
+        #[max_length = 255]
+        account -> Varchar,
+        #[max_length = 255]
+        psd -> Varchar,
+    }
+}
+
+diesel::table! {
     comments (comment_id) {
         comment_id -> Integer,
         post_id -> Nullable<Integer>,
         user_id -> Nullable<Integer>,
         comment -> Nullable<Text>,
         created_at -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
+    course (id) {
+        id -> Integer,
+        #[max_length = 50]
+        name -> Varchar,
+        credit -> Float,
+        #[sql_name = "type"]
+        type_ -> Integer,
+    }
+}
+
+diesel::table! {
+    course_arrange (id) {
+        id -> Integer,
+        teacher_id -> Integer,
+        course_id -> Integer,
+        #[max_length = 100]
+        course_time -> Varchar,
+        #[max_length = 100]
+        course_place -> Varchar,
+        max_num -> Integer,
+        selected_num -> Integer,
     }
 }
 
@@ -110,6 +144,8 @@ diesel::table! {
         audio_url -> Nullable<Varchar>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
+        like_count -> Nullable<Integer>,
+        comment_count -> Nullable<Integer>,
     }
 }
 
@@ -147,6 +183,15 @@ diesel::table! {
 }
 
 diesel::table! {
+    select_result (id) {
+        id -> Integer,
+        course_arrange_id -> Integer,
+        student_id -> Integer,
+        select_time -> Datetime,
+    }
+}
+
+diesel::table! {
     short_videos (video_id) {
         video_id -> Integer,
         user_id -> Nullable<Integer>,
@@ -156,6 +201,56 @@ diesel::table! {
         thumbnail_url -> Nullable<Varchar>,
         duration -> Nullable<Integer>,
         created_at -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
+    tequipment (id) {
+        id -> Integer,
+        #[max_length = 50]
+        name -> Nullable<Varchar>,
+        #[max_length = 255]
+        description -> Nullable<Varchar>,
+        #[max_length = 100]
+        code -> Nullable<Varchar>,
+        add_time -> Nullable<Datetime>,
+        price -> Nullable<Float>,
+        #[max_length = 255]
+        place -> Nullable<Varchar>,
+        user_Id -> Nullable<Integer>,
+    }
+}
+
+diesel::table! {
+    tuser (id) {
+        id -> Integer,
+        #[max_length = 50]
+        loginName -> Varchar,
+        #[max_length = 50]
+        real_name -> Nullable<Varchar>,
+        #[max_length = 50]
+        password -> Varchar,
+        #[max_length = 50]
+        tel -> Nullable<Varchar>,
+        #[max_length = 50]
+        email -> Nullable<Varchar>,
+        #[sql_name = "type"]
+        type_ -> Tinyint,
+        last_login_time -> Nullable<Datetime>,
+    }
+}
+
+diesel::table! {
+    user (id) {
+        id -> Integer,
+        #[max_length = 50]
+        login_name -> Varchar,
+        #[max_length = 50]
+        password -> Varchar,
+        #[max_length = 50]
+        real_name -> Varchar,
+        #[sql_name = "type"]
+        type_ -> Tinyint,
     }
 }
 
@@ -200,8 +295,15 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(course_arrange -> course (course_id));
+diesel::joinable!(select_result -> course_arrange (course_arrange_id));
+diesel::joinable!(select_result -> user (student_id));
+
 diesel::allow_tables_to_appear_in_same_query!(
+    a,
     comments,
+    course,
+    course_arrange,
     follows,
     likes,
     live_comments,
@@ -212,7 +314,11 @@ diesel::allow_tables_to_appear_in_same_query!(
     privacy_settings,
     recommendations,
     search_history,
+    select_result,
     short_videos,
+    tequipment,
+    tuser,
+    user,
     users,
     voice_chat_sessions,
     voice_messages,
