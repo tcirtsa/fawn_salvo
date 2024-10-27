@@ -59,6 +59,22 @@ pub async fn get_user_posts(req: &mut Request, res: &mut Response) -> Result<(),
     }
 }
 
+#[handler]
+pub async fn all_posts(res: &mut Response) -> Result<(), Error> {
+    let mut conn = connect().unwrap();
+    let result = posts.load::<Post>(&mut conn);
+    match result {
+        Ok(data) => {
+            res.render(Json(data));
+            Ok(())
+        }
+        Err(e) => {
+            res.render(Json(&e.to_string()));
+            Ok(())
+        }
+    }
+}
+
 pub fn change_like_count(p_id: i32, res: &mut Response, add: i32) -> Result<(), Error> {
     let mut conn = connect().unwrap();
     let result = diesel::update(posts.filter(post_id.eq(p_id)))

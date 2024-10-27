@@ -76,7 +76,11 @@ async fn main() {
         .into_handler();
 
     let router = Router::new()
-        .push(Router::with_path("/auth").goal(handler::user::auth).hoop(auth_handler))
+        .push(
+            Router::with_path("/auth")
+                .goal(handler::user::auth)
+                .hoop(auth_handler),
+        )
         .push(Router::with_path("/hello").push(Router::with_path("/123").get(hello)))
         .push(Router::with_path("/ws").goal(handler::ws::user_connected))
         .push(Router::with_path("/register").post(handler::user::register))
@@ -88,6 +92,7 @@ async fn main() {
         )
         .push(
             Router::with_path("/posts")
+                .get(handler::post::all_posts)
                 .push(Router::with_path("/add_post").post(handler::post::add_post))
                 .push(
                     Router::with_path("/<post_id>")
@@ -100,7 +105,10 @@ async fn main() {
                         )
                         .push(
                             Router::with_path("/comment")
-                                .push(Router::with_path("/comment_count").post(handler::comment::get_comment_count))
+                                .push(
+                                    Router::with_path("/comment_count")
+                                        .post(handler::comment::get_comment_count),
+                                )
                                 .push(
                                     Router::with_path("/<comment_id>")
                                         .post(handler::comment::get_comment),
@@ -108,7 +116,7 @@ async fn main() {
                                 .push(
                                     Router::with_path("/add_comment")
                                         .post(handler::comment::add_comment),
-                                )
+                                ),
                         ),
                 ),
         );
