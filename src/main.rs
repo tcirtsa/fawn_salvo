@@ -77,7 +77,6 @@ async fn main() {
                 .goal(handler::user::auth)
                 .hoop(auth_handler),
         )
-        .push(Router::with_path("/hello").push(Router::with_path("/123").get(hello)))
         .push(Router::with_path("/ws").goal(handler::ws::user_connected))
         .push(Router::with_path("/register").post(handler::user::register))
         .push(
