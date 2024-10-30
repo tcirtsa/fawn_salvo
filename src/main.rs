@@ -36,10 +36,6 @@ fn build_pool(database_url: &str, size: u32) -> Result<DbPool, PoolError> {
         .max_lifetime(None)
         .build(manager)
 }
-#[handler]
-async fn hello() -> &'static str {
-    "Hello, world!"
-}
 
 #[tokio::main]
 async fn main() {
