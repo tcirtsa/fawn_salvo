@@ -47,14 +47,10 @@ pub fn create_jwt_auth() -> JwtAuth<JwtClaims, ConstDecoder> {
     let jwt_secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
     JwtAuth::new(ConstDecoder::from_secret(jwt_secret.as_bytes()))
         .finders(vec![Box::new(QueryFinder::new("jwt_token"))])
-        .force_passed(true)
 }
 
 pub fn create_cors_handler() -> CorsHandler {
     Cors::new()
-        .allow_origin("*")
-        .allow_credentials(false)
-        .allow_headers(vec!["authorization", "content-type"])
-        .allow_methods(vec![Method::GET, Method::POST, Method::DELETE, Method::PUT])
+        .allow_methods(vec![Method::GET, Method::POST, Method::DELETE])
         .into_handler()
 }
