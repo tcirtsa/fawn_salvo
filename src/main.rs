@@ -83,7 +83,9 @@ async fn main() {
             Router::with_path("/user")
                 .push(Router::with_path("/updata_head").post(handler::user::updata_head))
                 .push(Router::with_path("/get_user").post(handler::user::get_user))
-                .push(Router::with_path("/get_user_posts").post(handler::post::get_user_posts)),
+                .push(Router::with_path("/get_user_posts").post(handler::post::get_user_posts))
+                .push(Router::with_path("/collect_voice").post(handler::voice::collect_voice_fingerprint))
+                .push(Router::with_path("/text_to_speech").post(handler::voice::text_to_speech)),
         )
         .push(
             Router::with_path("/posts")

@@ -270,6 +270,8 @@ diesel::table! {
         #[max_length = 255]
         avatar_url -> Nullable<Varchar>,
         bio -> Nullable<Text>,
+        #[max_length = 255]
+        voice_fingerprint -> Nullable<Varchar>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
     }
