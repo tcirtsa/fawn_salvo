@@ -1,4 +1,4 @@
-use crate::connect;
+use crate::config::connect;
 use crate::db::schema::users::dsl::*;
 use crate::model::user_model::User;
 use base64::{engine::general_purpose::STANDARD, Engine as _};

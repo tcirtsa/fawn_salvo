@@ -1,7 +1,6 @@
-use crate::connect;
+use crate::config::{connect, JwtClaims};
 use crate::db::schema::users::dsl::*;
 use crate::model::user_model::{NewUser, User};
-use crate::JwtClaims;
 
 use diesel::prelude::*;
 use dotenv::dotenv;
@@ -63,9 +62,9 @@ pub async fn updata_head(req: &mut Request, res: &mut Response) -> Result<(), Er
 #[handler]
 pub async fn get_user(req: &mut Request, res: &mut Response) -> Result<(), Error> {
     let mut conn = connect().unwrap();
-    let info = req.parse_json::<Info>().await?;
+    let name = req.param::<String>("username").unwrap();
     let result = users
-        .filter(username.eq(&info.username))
+        .filter(username.eq(&name))
         .first::<User>(&mut conn);
     match result {
         Ok(user) => {
