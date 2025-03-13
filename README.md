@@ -5,7 +5,7 @@
 ## 技术栈
 
 - **框架**: Salvo (Rust Web框架)
-- **数据库**: MySQL (使用Diesel ORM)
+- **数据库**: MariaDB (使用Diesel ORM)
 - **认证**: JWT (JSON Web Token)
 - **API**: RESTful API
 - **WebSocket**: 支持实时通信
