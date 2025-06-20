@@ -1,47 +1,68 @@
+// Jenkinsfile
 pipeline {
-    agent any // 或者你为流水线指定的具体代理
-
+    agent {
+        // 使用一个包含 Rust 工具链的 Docker 镜像作为构建环境
+        // 这里可以使用官方的 rust 镜像，或者你自己构建一个包含特定依赖的镜像
+        docker {
+            image 'rust:latest' // 使用最新的 Rust 官方镜像
+            args '-u root' // 有时在容器内构建需要root权限，但如果可能应避免
+        }
+    }
     stages {
         stage('Checkout') {
             steps {
-                echo '开始检出代码...'
-                // ***** 这一行是关键！ *****
-                // 它会使用你在 Jenkins UI 中配置的 GitHub URL、分支、凭据等信息，
-                // 实际地将你的项目代码克隆到 /var/jenkins_home/workspace/nbplus 目录。
+                // Jenkins会自动将代码检出到工作区，但显式写出更清晰
                 checkout scm
             }
         }
-
-        stage('Build with Docker') {
+        stage('Build Rust Project') {
             steps {
                 script {
-                    docker.image('rust:1.78').inside {
-                        echo '验证 Rust 和 Cargo 版本...'
-                        sh 'rustc --version'
-                        sh 'cargo --version'
-
-                        echo '开始构建 Rust 项目...'
-                        // 因为 `checkout scm` 已经把代码拉下来了，
-                        // 现在 `Cargo.toml` 就应该存在于 `/var/jenkins_home/workspace/nbplus` 目录中了。
+                    // 进入项目目录
+                    dir('fawn_salvo') { // 根据你的仓库结构，可能不需要这行，如果repo根目录就是项目
+                        // 构建 Rust 项目
                         sh 'cargo build --release'
                     }
                 }
             }
         }
-
-        // ... 其他你需要的阶段
+        stage('Run Tests (Optional)') {
+            steps {
+                script {
+                    dir('fawn_salvo') {
+                        // 运行 Rust 测试
+                        sh 'cargo test'
+                    }
+                }
+            }
+        }
+        stage('Package/Deploy (Optional)') {
+            steps {
+                script {
+                    dir('fawn_salvo') {
+                        // 示例：将构建好的二进制文件打包或复制到其他位置
+                        // 例如，如果构建产物在 target/release/fawn_salvo
+                        sh 'ls -lh target/release/'
+                        // 可以使用 Docker 构建最终的应用镜像
+                        // build an image from a Dockerfile in your repo
+                        // sh 'docker build -t my-fawn-salvo-app .'
+                        // 或者复制二进制文件
+                        // sh 'cp target/release/fawn_salvo /path/to/deploy'
+                    }
+                }
+            }
+        }
     }
-
-    // 后置操作，例如通知、清理等
     post {
         always {
-            echo '流水线执行完毕。'
+            // 构建完成后清理工作区
+            cleanWs()
         }
         success {
-            echo '流水线成功完成！'
+            echo 'Build successful!'
         }
         failure {
-            echo '流水线失败，请检查日志寻找错误原因。'
+            echo 'Build failed!'
         }
     }
 }
