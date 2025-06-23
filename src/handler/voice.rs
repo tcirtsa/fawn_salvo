@@ -36,7 +36,7 @@ fn to_salvo_error<E: std::fmt::Display>(err: E, message: &str) -> Error {
 }
 
 /// 采集用户声纹数据
-/// 
+///
 /// 接收Base64编码的音频数据，提取频谱特征，并存储到用户记录中
 #[handler]
 pub async fn collect_voice_fingerprint(req: &mut Request, res: &mut Response) -> Result<(), Error> {
@@ -51,8 +51,7 @@ pub async fn collect_voice_fingerprint(req: &mut Request, res: &mut Response) ->
 
     // 将音频数据转换为samples
     let cursor = Cursor::new(audio_bytes);
-    let decoder = rodio::Decoder::new(cursor)
-        .map_err(|e| to_salvo_error(e, "音频解码失败"))?;
+    let decoder = rodio::Decoder::new(cursor).map_err(|e| to_salvo_error(e, "音频解码失败"))?;
 
     // 获取采样率
     let sample_rate = decoder.sample_rate();
@@ -68,7 +67,7 @@ pub async fn collect_voice_fingerprint(req: &mut Request, res: &mut Response) ->
     // 将频谱数据序列化为字节 - 使用预分配容量优化性能
     let spectrum_data = spectrum.data();
     let mut voice_features = Vec::with_capacity(spectrum_data.len() * 8); // 每个数据点需要8字节(两个f32)
-    
+
     for (freq, mag) in spectrum_data {
         voice_features.extend_from_slice(&freq.val().to_le_bytes());
         voice_features.extend_from_slice(&mag.val().to_le_bytes());
@@ -88,7 +87,7 @@ pub async fn collect_voice_fingerprint(req: &mut Request, res: &mut Response) ->
 }
 
 /// 文本转语音功能
-/// 
+///
 /// 根据用户声纹生成语音数据
 #[handler]
 pub async fn text_to_speech(req: &mut Request, res: &mut Response) -> Result<(), Error> {
@@ -111,7 +110,7 @@ pub async fn text_to_speech(req: &mut Request, res: &mut Response) -> Result<(),
                 let duration = 2.0; // 2秒
                 let frequency = 440.0; // A4音符
                 let sample_count = (sample_rate as f32 * duration) as usize;
-                
+
                 // 预分配容量以提高性能
                 let mut samples = Vec::with_capacity(sample_count);
                 for i in 0..sample_count {

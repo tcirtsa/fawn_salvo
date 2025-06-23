@@ -41,10 +41,14 @@ pub async fn register(req: &mut Request, res: &mut Response) -> Result<(), Error
 }
 
 #[handler]
-pub async fn updata_head(req: &mut Request, depot: &mut Depot, res: &mut Response) -> Result<(), Error> {
+pub async fn updata_head(
+    req: &mut Request,
+    depot: &mut Depot,
+    res: &mut Response,
+) -> Result<(), Error> {
     let mut conn = connect().unwrap();
     let info = req.parse_json::<Info>().await?;
-    
+
     // 验证当前登录用户是否与要修改的用户一致
     if let Some(auth_data) = depot.jwt_auth_data::<JwtClaims>() {
         if auth_data.claims.username != info.username {
@@ -52,7 +56,7 @@ pub async fn updata_head(req: &mut Request, depot: &mut Depot, res: &mut Respons
             return Ok(());
         }
     }
-    
+
     let result = diesel::update(users.filter(username.eq(&info.username)))
         .set(avatar_url.eq(&info.data))
         .execute(&mut conn);

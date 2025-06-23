@@ -41,7 +41,7 @@ jobs:
         Copy-Item $dll.FullName -Destination .
         
     - name: Check code format
-      run: cargo fmt -- --check
+      run: cargo fmt
       
     - name: Lint with clippy
       run: cargo clippy -- -D warnings

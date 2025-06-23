@@ -12,7 +12,7 @@ pub struct Comment {
     pub created_at: Option<chrono::NaiveDateTime>,
 }
 
-#[derive(Insertable, Serialize, Deserialize,Debug)]
+#[derive(Insertable, Serialize, Deserialize, Debug)]
 #[diesel(table_name = comments)]
 pub struct NewComment<'a> {
     pub post_id: Option<i32>,
