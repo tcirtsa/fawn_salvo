@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install MariaDB
+      run: |
+        choco install mariadb
+        net start MySQL
+      
+    - name: Install latest rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        default: true
+        override: true
+        components: rustfmt, clippy
+        
+    - name: Cache rust dependencies
+      uses: Swatinem/rust-cache@v2
+    
+    - name: Copy MariaDB DLL
+      run: |
+        $mariadbPath = "C:\Program Files\MariaDB *\lib\libmariadb.dll"
+        $dll = Get-ChildItem -Path $mariadbPath | Select-Object -First 1
+        Copy-Item $dll.FullName -Destination .
+        
+    - name: Check code format
+      run: cargo fmt -- --check
+      
+    - name: Lint with clippy
+      run: cargo clippy -- -D warnings
+      
+    - name: Run tests
+      run: cargo test
+      
+    - name: Build
+      run: cargo build --verbose 
