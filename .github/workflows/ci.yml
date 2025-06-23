@@ -21,7 +21,7 @@ jobs:
 
     - name: Start MariaDB Service
       run: |
-        sc query MySQL | find "RUNNING" || net start MySQL
+        sc query MySQL | find /C:"RUNNING" >nul || net start MySQL
       
     - name: Install latest rust toolchain
       uses: actions-rs/toolchain@v1
