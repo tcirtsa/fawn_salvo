@@ -11,6 +11,10 @@ env:
   MYSQLCLIENT_LIB_DIR: "C:\\Program Files\\MariaDB 11.8\\lib"
   MYSQLCLIENT_VERSION: "11.8"
   LIBMYSQL_ENABLE_CLEARTEXT_PLUGIN: 1
+  # 数据库连接信息
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  REDIS_URL: ${{ secrets.REDIS_URL }}
 
 jobs:
   build:
@@ -32,6 +36,13 @@ jobs:
         $env:Path += ";C:\Program Files\MariaDB 11.8\lib"
         [Environment]::SetEnvironmentVariable("MYSQLCLIENT_LIB_DIR", "C:\Program Files\MariaDB 11.8\lib", "User")
         [Environment]::SetEnvironmentVariable("MYSQLCLIENT_INCLUDE_DIR", "C:\Program Files\MariaDB 11.8\include", "User")
+        
+    - name: Create test database
+      run: |
+        mysql -u root -e "CREATE DATABASE IF NOT EXISTS test_db;"
+        mysql -u root -e "CREATE USER IF NOT EXISTS 'test_user'@'localhost' IDENTIFIED BY 'test_password';"
+        mysql -u root -e "GRANT ALL PRIVILEGES ON test_db.* TO 'test_user'@'localhost';"
+        mysql -u root -e "FLUSH PRIVILEGES;"
         
     - name: Install latest rust toolchain
       uses: actions-rs/toolchain@v1

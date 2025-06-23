@@ -38,7 +38,7 @@ pub fn init_db_pool() {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     DB_POOL
         .set(
-            build_pool(&database_url, 10).expect(&format!("Error connecting to {}", &database_url)),
+            build_pool(&database_url, 10).unwrap_or_else(|_| panic!("Error connecting to {}", &database_url)),
         )
         .ok();
 }
