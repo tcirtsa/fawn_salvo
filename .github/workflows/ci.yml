@@ -36,6 +36,10 @@ jobs:
         $env:Path += ";C:\Program Files\MariaDB 11.8\lib"
         [Environment]::SetEnvironmentVariable("MYSQLCLIENT_LIB_DIR", "C:\Program Files\MariaDB 11.8\lib", "User")
         [Environment]::SetEnvironmentVariable("MYSQLCLIENT_INCLUDE_DIR", "C:\Program Files\MariaDB 11.8\include", "User")
+
+    - name: Link libmariadb.lib to mysqlclient.lib
+      run: |
+        Copy-Item "C:\Program Files\MariaDB 11.8\lib\libmariadb.lib" "C:\Program Files\MariaDB 11.8\lib\mysqlclient.lib"
         
     - name: Create test database
       run: |
